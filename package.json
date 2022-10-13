@@ -1,0 +1,20 @@
+{
+  "name": "aws-certification-task-1",
+  "version": "1.0.0",
+  "description": "Imagine that you are the owner of an online bakery that sells cakes. Your customers can purchase cakes online and they will get them delivered to their homes some time after. \r For that you need to:\r - create a serverless system to do the whole ordering process. \r - model the flow of the data. \r - manage the order in a stream of data.",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShiniTada/AWS-Certification-Task-1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShiniTada/AWS-Certification-Task-1/issues"
+  },
+  "homepage": "https://github.com/ShiniTada/AWS-Certification-Task-1#readme"
+}
