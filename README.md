@@ -21,6 +21,9 @@ For that you need to:
 
 `serverless config credentials --provider aws --key {iam-key} --secret {iam-secret}`
 
+For updating resources in AWS. Run it on demand </br>
+`serverless deploy`
+
 ### Part 1. Resources to create
 ![](media/part1.png)
 - AWS API Gateway - endpoint to order a cake: POST /order
@@ -34,6 +37,16 @@ Result: Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.
 - AWS DynamoDB - called by lambda(1) to store order metadata
 - AWS Kinesis Data Streams - called by lambda(1) to save an event "order_placed"
 - AWS Lambda(2) - executes when Kinesis wants to notify cake maker
+
+Result: Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order </br>
+with body:
+
+      {
+          "name": "Yana Bahdanovich",
+          "address": "Inasaridze 2 deadlock 35",
+          "productId": 1,
+          "quantity": 3
+      }
 
 **Why do we need to store data in stream?**
 

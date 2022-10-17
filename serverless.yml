@@ -1,10 +1,22 @@
 service: AWS-Certification-Task-1
-
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs12.x
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+      Resource:
+        - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ordersTable
+    - Effect: Allow
+      Action:
+        - kinesis:PutRecord
+      Resource:
+        - !Sub arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/order-events
 
 functions:
   createOrder:
@@ -13,3 +25,28 @@ functions:
       - http:
           path: /order
           method: post
+    environment:
+      orderTableName: ordersTable
+      orderStreamName: order-events
+
+resources:
+  Resources:
+    # CloudFormation stream name
+    orderEventsStream:
+      Type: AWS::Kinesis::Stream
+      Properties:
+        # Kinesis stream name
+        Name: order-events
+        ShardCount: 1
+    orderTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ordersTable
+        AttributeDefinitions:
+          - AttributeName: "orderId"
+            AttributeType: "S"
+        # Define "orderId" as key
+        KeySchema:
+          - AttributeName: "orderId"
+            KeyType: "HASH"
+        BillingMode: PAY_PER_REQUEST
