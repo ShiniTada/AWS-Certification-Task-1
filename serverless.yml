@@ -10,6 +10,7 @@ provider:
       Action:
         - dynamodb:PutItem
         - dynamodb:GetItem
+        - dynamodb:UpdateItem
       Resource:
         - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ordersTable
     - Effect: Allow
@@ -24,6 +25,15 @@ functions:
     events:
       - http:
           path: /order
+          method: post
+    environment:
+      orderTableName: ordersTable
+      orderStreamName: order-events
+  fulfillOrder:
+    handler: handler.fulfillOrder
+    events:
+      - http:
+          path: /order/fulfilled
           method: post
     environment:
       orderTableName: ordersTable
