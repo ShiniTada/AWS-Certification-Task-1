@@ -2,6 +2,8 @@
 
 const orderService = require("./service/orderService");
 const orderUtil = require("./util/orderUtil");
+const kinesisUtil = require("./util/kinensisUtil");
+const cakeMakerService = require("./service/cakeMakerService");
 
 /**
  * Save new order and return response
@@ -45,6 +47,18 @@ module.exports.fulfillOrder = async (event) => {
       console.log("Error occurred while updating the order. " + error);
       return createResponse(400, error);
     });
+};
+
+module.exports.notifyCakeMaker = async (event) => {
+  const records = kinesisUtil.getRecords(event);
+  const ordersPlaced = records.filter((r) => r.eventType === "order_placed");
+  console.log("received orders: " + JSON.stringify(ordersPlaced));
+
+  if (ordersPlaced <= 0) {
+    return "there is nothing";
+  }
+  cakeMakerService.handlePlacedOrders(ordersPlaced);
+  return "everything went well";
 };
 
 function createResponse(statusCode, message) {

@@ -5,19 +5,31 @@ provider:
   name: aws
   runtime: nodejs12.x
 
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:UpdateItem
-      Resource:
-        - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ordersTable
-    - Effect: Allow
-      Action:
-        - kinesis:PutRecord
-      Resource:
-        - !Sub arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/order-events
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+          Resource:
+            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ordersTable
+        - Effect: Allow
+          Action:
+            - kinesis:PutRecord
+          Resource:
+            - !Sub arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/order-events
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+          Resource:
+            - "*"
+          Condition:
+            StringEquals:
+              ses:FromAddress:
+                - Yana_Bahdanovich@mail.ru
+                - Yana_Bahdanovich@epam.com
 
 functions:
   createOrder:
@@ -38,6 +50,16 @@ functions:
     environment:
       orderTableName: ordersTable
       orderStreamName: order-events
+  notifyCakeMaker:
+    handler: handler.notifyCakeMaker
+    events:
+      - stream:
+          # does not support !Sub =(
+          arn: arn:aws:kinesis:us-east-1:846910419469:stream/order-events
+    environment:
+      region: us-east-1
+      orderingSystemEmail: Yana_Bahdanovich@mail.ru
+      cakeMakerEmail: Yana_Bahdanovich@epam.com
 
 resources:
   Resources:

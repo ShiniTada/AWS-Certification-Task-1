@@ -21,6 +21,9 @@ For that you need to:
 
 `serverless config credentials --provider aws --key {iam-key} --secret {iam-secret}`
 
+For creating serverless application: </br>
+`serverless --template aws-nodejs --name AWS-Certification-Task-1`
+
 For updating resources in AWS. Run it on demand </br>
 `serverless deploy`
 
@@ -30,7 +33,8 @@ For updating resources in AWS. Run it on demand </br>
 - AWS Lambda(1) - executes when the client request comes to an endpoint
 - AWS Deploy - to deploy application to AWS Account
 
-Result: Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order
+**Result:** </br>
+Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order
 
 ### Part 2. Resources to create
 ![](media/part2.png)
@@ -42,7 +46,8 @@ Result: Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.
 
 Data in DynamoDB is static(stores data information), while data in Stream is dynamic(saves an event). This event now can trigger other things. This approach provides better performantce than HTTP requests, as the messages are flowing inside the cloud platform and don't need to go over the Internet.
 
-Result: Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order </br>
+**Result:** </br>
+Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order </br>
 with body:
 
       {
@@ -55,6 +60,10 @@ with body:
 ### Part 3. Resources to create
 ![](media/part3.png)
 - AWS Simple Email Service - used by lambda(2) to email cake maker
+  
+**Result:** </br>
+On POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order </br>
+  with body above and application sends email to cake maker. 
 
 ### Part 4. Resources to create
 ![](media/part4.png)
@@ -63,7 +72,8 @@ with body:
 - AWS DynamoDB - called by lambda(3) to update order metadata
 - Amazon Kinesis Data Streams - called by lambda(3) to save an event "order_fulfilled"
 
-Result: Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order/fulfilled </br>
+**Result:** </br>
+Application available on: POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order/fulfilled </br>
 with body:
 
       {
