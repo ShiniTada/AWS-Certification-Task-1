@@ -4,6 +4,7 @@ const orderService = require("./service/orderService");
 const orderUtil = require("./util/orderUtil");
 const kinesisUtil = require("./util/kinensisUtil");
 const cakeMakerService = require("./service/cakeMakerService");
+const deliveryService = require("./service/deliveryService");
 
 /**
  * Save new order and return response
@@ -36,7 +37,7 @@ module.exports.fulfillOrder = async (event) => {
   const body = JSON.parse(event.body);
 
   return orderService
-    .updateOrder(body.orderId, body.fulfillmentId)
+    .updateOrderAndSendToKinesis(body.orderId, body.fulfillmentId)
     .then(() => {
       return createResponse(
         200,
@@ -49,17 +50,36 @@ module.exports.fulfillOrder = async (event) => {
     });
 };
 
-module.exports.notifyCakeMaker = async (event) => {
-  const records = kinesisUtil.getRecords(event);
-  const ordersPlaced = records.filter((r) => r.eventType === "order_placed");
-  console.log("received orders: " + JSON.stringify(ordersPlaced));
-
-  if (ordersPlaced <= 0) {
-    return "there is nothing";
-  }
-  cakeMakerService.handlePlacedOrders(ordersPlaced);
-  return "everything went well";
+module.exports.notifyExternalParties = async (event) => {
+  const orders = kinesisUtil.getRecords(event);
+  notifyCakeMaker(orders);
+  notifyDelivery(orders);
 };
+
+module.exports.notifyDeliveryCompany = async (event) => {
+  // Some HTTP call!
+  console.log("Nofitying some external resource about order readiness.");
+};
+
+function notifyCakeMaker(orders) {
+  const placedOrders = orders.filter((r) => r.eventType === "order_placed");
+  console.log("received new orders: " + JSON.stringify(placedOrders));
+  if (placedOrders.length > 0) {
+    cakeMakerService.handlePlacedOrders(placedOrders);
+    return "Cake maker is notified.";
+  }
+}
+
+function notifyDelivery(orders) {
+  const fulfilledOrders = orders.filter(
+    (r) => r.eventType === "order_fulfilled"
+  );
+  console.log("received fulfilled orders: " + JSON.stringify(fulfilledOrders));
+  if (fulfilledOrders.length > 0) {
+    deliveryService.handleFulfilledOrders(fulfilledOrders);
+    return "Delivery is notified.";
+  }
+}
 
 function createResponse(statusCode, message) {
   const response = {

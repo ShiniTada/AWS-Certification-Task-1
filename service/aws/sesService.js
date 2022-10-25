@@ -5,7 +5,7 @@ const ses = new AWS.SES({
   region: process.env.region,
 });
 
-module.exports.notifyCakeMakerByEmail = (order, fromEmail, toEmail) => {
+module.exports.notifyByEmail = (subject, order, fromEmail, toEmail) => {
   const params = {
     Source: fromEmail,
     Destination: {
@@ -14,7 +14,7 @@ module.exports.notifyCakeMakerByEmail = (order, fromEmail, toEmail) => {
     Message: {
       Subject: {
         Charset: "UTF-8",
-        Data: "New cake order",
+        Data: JSON.stringify(subject),
       },
       Body: {
         Text: {
@@ -35,8 +35,5 @@ module.exports.notifyCakeMakerByEmail = (order, fromEmail, toEmail) => {
           JSON.stringify(data)
       );
       return data;
-    })
-    .catch((err) => {
-      console.log("Error occurred while sending nitification. " + err);
     });
 };

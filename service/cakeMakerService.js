@@ -6,16 +6,20 @@ const sesService = require("./aws/sesService");
 const CAKE_MAKER_EMAIL = process.env.cakeMakerEmail;
 const ORDERING_SYSTEM_EMAIL = process.env.orderingSystemEmail;
 
-module.exports.handlePlacedOrders = (ordersPlaced) => {
+module.exports.handlePlacedOrders = (orders) => {
   let responses = [];
-  for (let order of ordersPlaced) {
-    let response = sesService.notifyCakeMakerByEmail(
-      order,
-      ORDERING_SYSTEM_EMAIL,
-      CAKE_MAKER_EMAIL
-    );
-    responses.push(response);
+  for (let order of orders) {
+    sesService
+      .notifyByEmail(
+        order,
+        "New cake order",
+        ORDERING_SYSTEM_EMAIL,
+        CAKE_MAKER_EMAIL
+      )
+      .then((data) => {
+        responses.push(data);
+        console.log("SES responses: " + JSON.stringify(responses));
+      });
   }
-  console.log("SES responses: " + JSON.stringify(responses));
   return responses;
 };

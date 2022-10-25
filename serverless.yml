@@ -30,6 +30,11 @@ provider:
               ses:FromAddress:
                 - Yana_Bahdanovich@mail.ru
                 - Yana_Bahdanovich@epam.com
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource:
+            - !Sub arn:aws:sqs:${AWS::Region}::${AWS::AccountId}:deliveryServiceQueue
 
 functions:
   createOrder:
@@ -50,8 +55,8 @@ functions:
     environment:
       orderTableName: ordersTable
       orderStreamName: order-events
-  notifyCakeMaker:
-    handler: handler.notifyCakeMaker
+  notifyExternalParties:
+    handler: handler.notifyExternalParties
     events:
       - stream:
           # does not support !Sub =(
@@ -60,6 +65,19 @@ functions:
       region: us-east-1
       orderingSystemEmail: Yana_Bahdanovich@mail.ru
       cakeMakerEmail: Yana_Bahdanovich@epam.com
+      deliveryCompanyQueue:
+        Ref: deliveryServiceQueue
+      orderTableName: ordersTable
+  notifyDeliveryCompany:
+    handler: handler.notifyDeliveryCompany
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - deliveryServiceQueue
+              - Arn
+          batchSize: 1
+
 
 resources:
   Resources:
@@ -82,3 +100,8 @@ resources:
           - AttributeName: "orderId"
             KeyType: "HASH"
         BillingMode: PAY_PER_REQUEST
+    deliveryServiceQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: deliveryServiceQueue
+

@@ -14,7 +14,6 @@ For that you need to:
 3. The order will appear as an email to the cake maker so they know that they have a new order to prepare. 
 4. When the cake maker is done making the cake, they will notify the system that the order is fulfilled. 
 5. When the order is fulfilled, the system now needs to notify the delivery company to take the cake to the customer. 
-6. When the customer receives the cake, they will need to notify the company that they have received it. Now the order is completed and delivered. ☺️ 
 
 ### Part 0. Preparation
 `npm install -g serverless`
@@ -93,13 +92,5 @@ with body:
 Reason is to keep the system as loosely decoupled as you can! </br>
 Example: if you need to change delivery company, you can do it easily without modifying lambda from the core flow.
 
-### Part 6. Resources to create
-![](media/part6.png)
-- AWS API Gateway - endpoint for client, called when he receives a cake: POST /order/delivered
-- AWS Lambda(6) - executes when the client do POST /order/delivered
-- AWS DynamoDB - called by lambda(6) to update order metadata
-
-Now the order is completed. Also, Delivery can ask for review/feedback.
-
-- AWS SQS - feedback is sent here by lambda(6) call and trigger the last lambda(7)
-- AWS Lambda(7) - will call API in the Customer service to report a feedback that the user provided
+On POST https://nvwuhpr1a7.execute-api.us-east-1.amazonaws.com/dev/order/fulfilled
+with body above and application sends notification to external resource.
